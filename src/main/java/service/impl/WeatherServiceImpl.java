@@ -21,32 +21,40 @@ public class WeatherServiceImpl implements WeatherService {
     @Value("${api.key}")
     private String apiKey;
 
-    public Weather getByCityName(String city) {
+    public String getByCityName(String city) {
         validateCityName(city);
         var gson = new Gson();
 
         var httpClient = HttpClient.newBuilder()
                 .build();
 
+        System.out.println(GET_WEATHER_IN_CITY_URL + city + API_KEY_PARAM + apiKey);
+
         var request = HttpRequest.newBuilder()
                 .GET()
-                .uri(URI.create(GET_WEATHER_IN_CITY_URL + city + API_KEY_PARAM + apiKey))
+                .uri(URI.create(GET_WEATHER_IN_CITY_URL + city + API_KEY_PARAM + "c37e2350a6d34a358b04e1c8de6b13fd"))
                 .build();
 
         HttpResponse<String> response = null;
         try {
             response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());
         } catch (IOException | InterruptedException e) {
-            System.out.println("CATCH");
             e.printStackTrace();
         }
 
         WeatherResponse weathers = gson.fromJson(response.body(), WeatherResponse.class);
 
-        return weathers.data[0];
+        var responseStr = "Invalid city name!";
+        try {
+            if (weathers.data.length == 1) {
+                responseStr = weathers.data[0].toString();
+            }
+        } catch (NullPointerException ignored) {
+        }
+        return responseStr;
     }
 
-    class WeatherResponse {
+    static class WeatherResponse {
         Weather[] data;
     }
 }

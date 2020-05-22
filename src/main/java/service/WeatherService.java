@@ -9,7 +9,7 @@ import static service.ApiConstants.CITY_REGEX;
 
 public interface WeatherService {
 
-    Weather getByCityName (String city) throws IOException, InterruptedException;
+    String getByCityName (String city) throws IOException, InterruptedException;
 
     default void validateCityName (String city) {
         if (!city.matches(CITY_REGEX)) {

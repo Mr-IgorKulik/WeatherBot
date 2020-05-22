@@ -2,31 +2,52 @@ package bot;
 
 import org.telegram.telegrambots.api.methods.send.SendMessage;
 import org.telegram.telegrambots.api.objects.Update;
+import org.telegram.telegrambots.api.objects.replykeyboard.ReplyKeyboardMarkup;
+import org.telegram.telegrambots.api.objects.replykeyboard.buttons.KeyboardRow;
 import org.telegram.telegrambots.bots.TelegramLongPollingBot;
 import org.telegram.telegrambots.exceptions.TelegramApiException;
+import service.impl.WeatherServiceImpl;
+
+import java.util.List;
 
 public class Bot extends TelegramLongPollingBot {
 
+    private ReplyKeyboardMarkup replyKeyboardMarkup = new ReplyKeyboardMarkup();
+
     @Override
     public void onUpdateReceived(Update update) {
-        String text = update.getMessage().getText();
-        String firstName = update.getMessage().getFrom().getFirstName();
+        var cityName = update.getMessage().getText();
 
-        System.out.println("msg: " + text + " | from: " + firstName);
-        sendMsg(update.getMessage().getChatId().toString(), text);
-    }
+        var service = new WeatherServiceImpl();
 
-    private synchronized void sendMsg(String chatId, String msg) {
         var sendMessage = new SendMessage();
         sendMessage.enableMarkdown(true);
-        sendMessage.setChatId(chatId);
-        sendMessage.setText(msg);
+        sendMessage.setChatId(update.getMessage().getChatId().toString());
+        sendMessage.setText(service.getByCityName(cityName).toString());
+
+
+        KeyboardRow weatherKeyboardBtn = new KeyboardRow();
+        weatherKeyboardBtn.add("Weather");
+
+        KeyboardRow helloKeyboardBtn = new KeyboardRow();
+        helloKeyboardBtn.add("Hello");
+
+        sendMessage.setReplyMarkup(replyKeyboardMarkup);
+
+        replyKeyboardMarkup.setKeyboard(List.of(helloKeyboardBtn, weatherKeyboardBtn));
+        replyKeyboardMarkup.setSelective(true);
+        replyKeyboardMarkup.setResizeKeyboard(true);
+
         try {
-            sendMessage(sendMessage);
+            execute(sendMessage);
         } catch (TelegramApiException e) {
             e.printStackTrace();
         }
     }
+
+    /*private synchronized void sendMsg(String chatId, String msg) {
+
+    }*/
 
     @Override
     public String getBotUsername() {
