@@ -28,8 +28,6 @@ public class WeatherServiceImpl implements WeatherService {
         var httpClient = HttpClient.newBuilder()
                 .build();
 
-        System.out.println(GET_WEATHER_IN_CITY_URL + city + API_KEY_PARAM + apiKey);
-
         var request = HttpRequest.newBuilder()
                 .GET()
                 .uri(URI.create(GET_WEATHER_IN_CITY_URL + city + API_KEY_PARAM + "c37e2350a6d34a358b04e1c8de6b13fd"))
